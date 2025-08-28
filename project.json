@@ -1,0 +1,13 @@
+{
+    "name": "phone-autojs-script",
+    "version": "1.0.0",
+    "versionCode": 1,
+    "packageName": "com.phone.autojs.script",
+    "main": "main.js",
+    "launchConfig": {
+        "hideLogs": false
+    },
+    "author": "Your Name",
+    "license": "ISC",
+    "description": "AutoJs6 daily check-in task project"
+}
