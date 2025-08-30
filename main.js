@@ -14,7 +14,7 @@ const zhifubao = require("./tasks/zhifubao.js");
 // 单个运行
 // chinamobile.run()
 // douyin.run()
-// kuaishou.run()
+kuaishou.run()
 // pinduoduo.run()
 // taobao.run()
-zhifubao.run()
+// zhifubao.run()
