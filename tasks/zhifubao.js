@@ -93,7 +93,8 @@ function 复位到视频页面() {
         clickByText("视频")
         sleep(2 * 1000)
     } else if (text("消息").exists()) {
-        clickByText("消息")
+        // tabs点击中间
+        clickByText("tabs")
         sleep(2 * 1000)
     } else {
         back()
@@ -112,31 +113,14 @@ function 复位到视频红包页面() {
     sleep(8000)
 }
 
-function runTask() {
-    去领取去预约()
-    去签到()
-    去看看()
-    浏览广告领红包()
-    刷视频();
-}
-
-
-function bootRunTask() {
-    // 1. 启动应用
-    logger.log(`尝试启动${this.appName}`);
-    if (!launchApp(this.appName)) {
-        logger.log("启动应用失败");
-        return;
-    }
-    sleep(5000)
-    // 执行任务
-    runTask();
-    // 关闭应用
-    closeApp(this.appName)
-}
 module.exports = {
-    enabled: false,
     appName: "支付宝",    // 任务名称
     priority: 2,             // 优先级
-    run: bootRunTask
+    fun: [
+        去领取去预约,
+        去签到,
+        去看看,
+        浏览广告领红包,
+        刷视频,
+    ]
 }

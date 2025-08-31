@@ -4,8 +4,7 @@ module.exports = function(tag='default') {
     return {
         log: function(message) {
             if (appConfig.logEnabled) {
-                toast(`[${tag}] ${message}`)
-                console.log(`[${tag}] ${message}`);
+                toastLog(`[${tag}] ${message}`, 'short', 'forcible')
             }
         },
     };

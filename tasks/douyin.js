@@ -1,5 +1,5 @@
 const config = require("../config/appConfig.js");
-const logger = require("../core/logger.js")("template");
+const logger = require("../core/logger.js")("douyin");
 const appOperator = require("../core/operator.js");
 const { clickByText, clickByMatches,closeApp, swipeTop, swipeLeft, scrollDownFindElement } = appOperator;
 
@@ -285,40 +285,23 @@ function 复位到赚钱页面() {
     }
 }
 
-function runTask() {
-    签到()
-    回归现金福利()
-    明日0点一键领金币()
-    打卡领华为手机()
-    吃饭打卡赚金币()
-    看广告赚金币()
-    天天领金币()
-    看直播开宝箱()
-    连续刷指定视频赚金币()
-    逛街赚钱()
-    看短剧赚更多金币()
-    睡前看小说赚金币()
-    看爆款短剧加倍赚金币()
-    周末送加倍赚()
-}
-
-function bootRunTask() {
-    // 1. 启动应用
-    logger.log(`尝试启动${this.appName}`);
-    if (!launchApp(this.appName)) {
-        logger.log("启动应用失败");
-        return;
-    }
-    sleep(5000)
-    // 执行任务
-    runTask();
-    // 关闭应用
-    closeApp(this.appName)
-}
-
 module.exports = {
-    enabled: false,
     appName: "抖音极速版",    // 任务名称
     priority: 2,             // 优先级
-    run: bootRunTask
+    fun: [
+        签到,
+        回归现金福利,
+        明日0点一键领金币,
+        打卡领华为手机,
+        吃饭打卡赚金币,
+        看广告赚金币,
+        天天领金币,
+        看直播开宝箱,
+        连续刷指定视频赚金币,
+        逛街赚钱,
+        看短剧赚更多金币,
+        睡前看小说赚金币,
+        看爆款短剧加倍赚金币,
+        周末送加倍赚,
+    ]
 }

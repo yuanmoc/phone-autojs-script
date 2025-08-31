@@ -75,28 +75,13 @@ function 复位到首页() {
     }
 }
 
-function runTask() {
-    红包签到()
-    淘金币抵()
-}
-
-function bootRunTask() {
-    // 1. 启动应用
-    logger.log(`尝试启动${this.appName}`);
-    if (!launchApp(this.appName)) {
-        logger.log("启动应用失败");
-        return;
-    }
-    sleep(5000)
-    // 执行任务
-    runTask();
-    // 关闭应用
-    closeApp(this.appName)
-}
 
 module.exports = {
-    enabled: false,
     appName: "淘宝",    // 任务名称
     priority: 1,             // 优先级
-    run: bootRunTask
+    fun: [
+        红包签到,
+        淘金币抵
+    ]
+
 }

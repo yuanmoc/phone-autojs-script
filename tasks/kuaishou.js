@@ -68,13 +68,13 @@ function 领福利() {
             if (video_countdown) {
                 video_countdown_text = video_countdown.text()
                 let number = video_countdown_text.match(/\d+/)[0];
-                console.log(number)
+                logger.log(number+'秒')
                 sleep(number * 1000)
             } else {
                 neo_count_down_text = id('neo_count_down_text').findOne(5000)
                 let neo_count_down_seconds = neo_count_down_text.text().match(/\d+/g).map(Number);
                 let totalSeconds = neo_count_down_seconds[0] * 60 + neo_count_down_seconds[1];
-                console.log(totalSeconds)
+                logger.log(totalSeconds+'秒')
                 sleep(totalSeconds * 1000)
             }
             sleep(2000)
@@ -157,38 +157,18 @@ function 复位去赚钱() {
     }
 }
 
-
-function runTask() {
-    立即签到();
-    去点赞()
-    去打卡();
-    去打卡();
-    去走路();
-    去领取();
-    领福利();
-    刷广告视频赚金币();
-    看指定视频赚金币();
-    看视频赚金币();
-    立即领取();
-}
-
-function bootRunTask() {
-    // 1. 启动应用
-    logger.log(`尝试启动${this.appName}`);
-    if (!launchApp(this.appName)) {
-        logger.log("启动应用失败");
-        return;
-    }
-    sleep(5000)
-    // 执行任务
-    runTask();
-    // 关闭应用
-    closeApp(this.appName)
-}
-
 module.exports = {
-    enabled: true,
     appName: "快手极速版",    // 任务名称
     priority: 2,             // 优先级
-    run: bootRunTask
+    fun: [
+        去点赞,
+        去打卡,
+        去走路,
+        去领取,
+        领福利,
+        刷广告视频赚金币,
+        看指定视频赚金币,
+        看视频赚金币,
+        立即领取,
+    ]
 }

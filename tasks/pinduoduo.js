@@ -62,6 +62,16 @@ function 去逛逛(_text) {
     }
 }
 
+function 看商品视频得现金() {
+    去逛逛("看商品视频得现金")
+}
+function 看直播赚现金() {
+    去逛逛("看直播赚现金")
+}
+function 看短剧领金币() {
+    去逛逛("看短剧领金币")
+}
+
 function 去观看() {
     关闭继续来赚钱弹窗()
     复位到金币页面()
@@ -76,6 +86,24 @@ function 去观看() {
         swipeTop();
     }
     back()
+}
+
+function 去领取() {
+    关闭继续来赚钱弹窗()
+    复位到金币页面()
+    if (text("去领取").exists()) {
+        if (clickByText("去领取")) {
+            sleep(config.baseDelay * 2);
+            clickByMatches(/喝水打卡领\d+金币/)
+            sleep(config.baseDelay * 2);
+            let startTime = new Date().getTime();
+            while (new Date().getTime() - startTime < 2 * 62 * 1000) {
+                sleep(config.baseDelay * 5);
+                swipeTop();
+            }
+            back()
+        }
+    }
 }
 
 function 复位到金币页面() {
@@ -105,33 +133,16 @@ function 复位到金币页面() {
 }
 
 
-function runTask() {
-    领取今日现金()
-    去阅读()
-    去逛逛("看商品视频得现金")
-    去逛逛("看直播赚现金")
-    去逛逛("看短剧领金币")
-    去观看()
-}
-
-function bootRunTask() {
-    // 1. 启动应用
-    logger.log(`尝试启动${this.appName}`);
-    if (!launchApp(this.appName)) {
-        logger.log("启动应用失败");
-        return;
-    }
-    sleep(5000)
-    // 执行任务
-    runTask();
-    // 关闭应用
-    closeApp(this.appName)
-}
-
-
 module.exports = {
-    enabled: false,
     appName: "拼多多",    // 任务名称
     priority: 2,             // 优先级
-    run: bootRunTask
+    fun: [
+        领取今日现金,
+        去阅读,
+        看商品视频得现金,
+        看直播赚现金,
+        看短剧领金币,
+        去观看,
+        去领取,
+    ]
 }

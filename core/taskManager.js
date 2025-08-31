@@ -1,6 +1,6 @@
 const appConfig = require("../config/appConfig.js");
-const config = require("../config/appConfig");
 const logger = require("./logger.js")("taskManager");
+const {closeApp, openMiniProgram} = require("./operator.js");
 
 let tasks = [];
 
@@ -17,54 +17,76 @@ module.exports = {
                 logger.log(`加载任务文件: tasks/${fileName}`);
                 const taskModule = require(`../tasks/${fileName}`);
                 // 假设每个任务模块都导出了一个包含run方法的对象
-                return { taskId: taskId, appName: taskModule.appName, priority: taskModule.priority, enabled: taskModule.enabled, run: taskModule.run };
+                return Object.assign({taskId: taskId}, taskModule);
             } catch (e) {
                 logger.log(`加载任务 ${taskId} 失败: ${e.message}`);
-                return { taskId: taskId, enabled: false};
             }
         });
         logger.log("所有任务已注册");
     },
 
-    start: function() {
-        this.registerTasks(); // 注册所有任务
-        logger.log("任务管理器已启动");
-        this.checkAndRunTasks(); // 立即执行一次检查
+    getAllTasks: function() {
+        return tasks;
     },
 
     checkAndRunTasks: function() {
+        logger.log("任务管理器已启动");
         sleep(appConfig.baseDelay); // 每次检查前的基础延迟
         tasks.sort((a, b) => a.priority - b.priority).forEach(task => {
-            if (task.enabled) {
-                logger.log(`${task.taskId} 准备执行任务: ${task.appName}`);
-                this.runTask(task.taskId);
-            }
+            logger.log(`${task.taskId} 准备执行任务: ${task.appName}`);
+            this.runTask(task.taskId);
         });
     },
 
-    runTask: function(taskId) {
+
+    runTask: function(taskId, funNameArr=null) {
         const task = tasks.find(t => t.taskId === taskId);
         if (!task) {
             logger.log(`任务 ${taskId} 未找到`);
             return;
         }
 
-        const execute = () => {
-            sleep(appConfig.baseDelay); // 任务执行前的基础延迟
-            try {
-                task.run();
-                sleep(config.baseDelay * 5); // 添加一个更长的延迟，以等待任务完成
-                logger.log(`任务 ${task.appName} 执行成功`);
-            } catch (e) {
-                logger.log(`任务 ${task.appName} 执行异常: ${e.message}`);
-            } finally {
-                if (appConfig.autoExit) {
-                    home();
-                    sleep(appConfig.baseDelay);
+        try {
+            // 1. 启动应用
+            logger.log(`尝试启动${task.appName}`);
+            if (task.miniProgram) {
+                if (!openMiniProgram(task.appName)) {
+                    logger.log("启动小程序失败");
+                    return;
+                }
+            } else {
+                if (!launchApp(task.appName)) {
+                    logger.log("启动应用失败");
+                    return;
                 }
             }
-        };
-        execute();
+            // 启动应用后等待一段时间
+            sleep(3000)
+            // 2. 执行任务
+            // 默认执行全部
+            if (!funNameArr) {
+                funNameArr = task.fun
+            }
+            for (let funName of funNameArr) {
+                if (typeof funName === 'function') {
+                    funName();
+                } else if (typeof funName === 'string') {
+                    eval(funName)();
+                }
+            }
+            // 添加一个更长的延迟，以等待任务完成
+            sleep(6000);
+            logger.log(`任务 ${task.appName} 执行成功`);
+        } catch (e) {
+            logger.log(`任务 ${task.appName} 执行异常: ${e.message}`);
+        } finally {
+            if (appConfig.autoExit) {
+                // 关闭应用
+                closeApp(task.appName)
+                home();
+                sleep(5000);
+            }
+        }
     }
 
 };
