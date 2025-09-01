@@ -173,7 +173,7 @@ function scrollDownFindElement(_text, maxScrolls = 3) {
             }
         }
         swipe(device.width / 2, device.height / 2, device.width / 2, device.height / 8, 500)
-        sleep(5000);
+        sleep(1000);
         scrolls++;
     }
     logger.log("未找到元素：" + _text);

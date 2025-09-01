@@ -69,9 +69,18 @@ module.exports = {
             }
             for (let funName of funNameArr) {
                 if (typeof funName === 'function') {
+                    logger.log(`执行函数 ${funName.name}`);
                     funName();
                 } else if (typeof funName === 'string') {
-                    eval(funName)();
+                    logger.log(`执行字符串函数 ${funName}`);
+                    // 根据名称查找方法，并执行
+                    let methodKey = Object.keys(task.fun).find(key => task.fun[key].name === funName);
+                    if (methodKey) {
+                        let method = task.fun[methodKey];
+                        method()
+                    } else {
+                        logger.log(`未找到指定的方法: ${funName}`);
+                    }
                 }
             }
             // 添加一个更长的延迟，以等待任务完成

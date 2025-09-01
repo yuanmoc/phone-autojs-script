@@ -1,7 +1,7 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("douyin");
 const appOperator = require("../core/operator.js");
-const { clickByText, clickByMatches,closeApp, swipeTop, swipeLeft, scrollDownFindElement } = appOperator;
+const { clickByText, clickByMatches,clickWidget, swipeTop, swipeLeft, scrollDownFindElement } = appOperator;
 
 
 function 签到() {
@@ -21,13 +21,25 @@ function 回归现金福利() {
     }
 }
 
-function 明日0点一键领金币() {
+function 一键领金币() {
     复位到赚钱页面()
     if (clickByMatches(/.*后可一键领取/, 1)) {
         sleep(1000)
         if (clickByText("一键领取")) {
             sleep(1000)
             back()
+        }
+    }
+    if (clickByMatches(/已预约，.*可一键领取/, 1)) {
+        sleep(1000)
+        if (clickByText("立即领现金")) {
+            if (clickByText("一键领取")) {
+                sleep(1000)
+                clickByText("开心收下")
+                sleep(5000)
+                clickByText("立即预约领取")
+                back()
+            }
         }
     }
 }
@@ -38,12 +50,13 @@ function 打卡领华为手机() {
         return
     }
     if (clickByMatches(/已打卡\d+天，.*/, 1)) {
-        sleep(3000)
-        // TODO 有问题
-        if(clickByText("点击打卡")) {
-            sleep(3000)
-            back();
+        sleep(2000)
+        let list = text("点击打卡").find(5000)
+        for (let i = 0; i < list.length; i++) {
+            clickWidget(list[i])
+            sleep(5000)
         }
+        back()
     }
 }
 
@@ -53,8 +66,8 @@ function 吃饭打卡赚金币() {
         return
     }
     if (clickByText("打卡领吃饭补贴，浏览精选美食团购")) {
-        sleep(5000)
-        if (clickByText("看指定视频领晚餐补贴")) {
+        sleep(3000)
+        if (clickWidget(textMatches(/看指定视频领.*/))) {
             sleep(40* 1000)
             back()
             sleep(1000)
@@ -70,10 +83,10 @@ function 吃饭打卡赚金币() {
 
 function 看广告赚金币() {
     复位到赚钱页面()
-    if (!scrollDownFindElement(/每\d+分钟完成一次广告任务，单日最高可赚\d+金币/, 8)) {
+    if (!scrollDownFindElement(/看广告视频.*/, 8)) {
         return;
     }
-    if (clickByMatches(/每\d+分钟完成一次广告任务，单日最高可赚\d+金币/)) {
+    if (clickByMatches(/看广告视频.*/)) {
         sleep(40* 1000)
         back()
         sleep(1000)
@@ -91,10 +104,10 @@ function 看广告赚金币() {
 
 function 天天领金币() {
     复位到赚钱页面()
-    if (!scrollDownFindElement(/今日签到立即领\d+金币，做任务最高领\d+万金币/, 8)) {
+    if (!scrollDownFindElement(/今日签到立即领.*/, 8)) {
         return;
     }
-    if (clickByMatches(/今日签到立即领\d+金币，做任务最高领\d+万金币/)) {
+    if (clickByMatches(/今日签到立即领.*/)) {
         sleep(5000)
         // TODO::
     }
@@ -261,6 +274,9 @@ function 周末送加倍赚() {
 
 }
 
+function 设置获取广告时间() {
+
+}
 
 function 关闭弹窗() {
     if (text("关闭").exists()) {
@@ -291,15 +307,15 @@ module.exports = {
     fun: [
         签到,
         回归现金福利,
-        明日0点一键领金币,
+        一键领金币, // 2927 金币
         打卡领华为手机,
-        吃饭打卡赚金币,
+        吃饭打卡赚金币, // 500 金币
         看广告赚金币,
         天天领金币,
-        看直播开宝箱,
-        连续刷指定视频赚金币,
-        逛街赚钱,
-        看短剧赚更多金币,
+        看直播开宝箱, //
+        连续刷指定视频赚金币, // 35 金币
+        逛街赚钱, // 598
+        看短剧赚更多金币, //
         睡前看小说赚金币,
         看爆款短剧加倍赚金币,
         周末送加倍赚,

@@ -19,16 +19,18 @@ function 去点赞() {
 }
 
 function 去打卡() {
-    复位去赚钱()
-    clickByText("海量金币")
-    sleep(1000)
-    if (clickByText("去打卡")) {
-        sleep(2000)
-        clickByText("去签到")
+    for (let i = 0; i < 2; i++) {
+        复位去赚钱()
+        clickByText("海量金币")
         sleep(1000)
-        clickByText("去打卡")
-        sleep(1000)
-        back()
+        if (clickByText("去打卡")) {
+            sleep(2000)
+            clickByText("去签到")
+            sleep(1000)
+            clickByText("去打卡")
+            sleep(1000)
+            back()
+        }
     }
 }
 
@@ -56,28 +58,15 @@ function 去领取() {
     }
 }
 
-function 领福利() {
+function 看广告得金币() {
     复位去赚钱()
     clickByText("轻松上手")
     sleep(1000)
     // 循环10次领取福利
     for (let i = 0; i < 10; i++) {
-        if (clickByText("领福利")) {
-            sleep(100)
-            video_countdown = id("video_countdown").findOne(2000)
-            if (video_countdown) {
-                video_countdown_text = video_countdown.text()
-                let number = video_countdown_text.match(/\d+/)[0];
-                logger.log(number+'秒')
-                sleep(number * 1000)
-            } else {
-                neo_count_down_text = id('neo_count_down_text').findOne(5000)
-                let neo_count_down_seconds = neo_count_down_text.text().match(/\d+/g).map(Number);
-                let totalSeconds = neo_count_down_seconds[0] * 60 + neo_count_down_seconds[1];
-                logger.log(totalSeconds+'秒')
-                sleep(totalSeconds * 1000)
-            }
+        if (clickByText("看广告得金币")) {
             sleep(2000)
+            设置获取广告时间()
             back()
             sleep(1000)
             clickByText("close_view")
@@ -134,15 +123,35 @@ function 刷广告视频赚金币() {
     复位去赚钱()
     clickByText("猜你喜欢")
     sleep(1000)
-    if (scrollDownFindElement("刷广告视频赚金币")) {
-        sleep(1000)
-        if (clickByText("刷广告视频赚金币", 2, 9 / 10, 1 / 2)) {
-            for (let i = 0; i < 100; i++) {
-                swipeTop()
-                sleep(5000)
-            }
+    if (!scrollDownFindElement("刷广告视频赚金币")) {
+        return;
+    }
+    sleep(1000)
+    if (clickByText("刷广告视频赚金币", 2, 9 / 10, 1 / 2)) {
+        for (let i = 0; i < 100; i++) {
+            swipeTop()
+            sleep(5000)
         }
     }
+}
+
+function 设置获取广告时间() {
+    let sleep_time = null
+    let video_countdown = id("video_countdown").findOne(5000)
+    if (video_countdown) {
+        let video_countdown_text = video_countdown.text()
+        sleep_time = video_countdown_text.match(/\d+/)[0];
+    } else {
+        let neo_count_down_text = id('neo_count_down_text').findOne(5000)
+        if (neo_count_down_text) {
+            let neo_count_down_seconds = neo_count_down_text.text().match(/\d+/g).map(Number);
+            sleep_time = neo_count_down_seconds[0] * 60 + neo_count_down_seconds[1];
+        }
+
+    }
+    sleep_time = sleep_time || 62
+    logger.log("sleep_time: " + sleep_time)
+    sleep(sleep_time * 1000)
 }
 
 
@@ -165,10 +174,10 @@ module.exports = {
         去打卡,
         去走路,
         去领取,
-        领福利,
-        刷广告视频赚金币,
-        看指定视频赚金币,
-        看视频赚金币,
+        看广告得金币, // 15-200 金币
+        刷广告视频赚金币, // 15 金币
+        看指定视频赚金币, // 166 金币
+        看视频赚金币, // 目前没有
         立即领取,
     ]
 }

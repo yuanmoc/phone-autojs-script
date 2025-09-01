@@ -126,18 +126,7 @@ ui.emitter.on("resume", () => {
     // 当UI恢复时，可以执行一些恢复操作
 });
 
-// 20秒超时后自动执行所有任务，为定时任务准备
-setTimeout(() => {
-    if (!ui.run_selected_task.isPressed() && !ui.run_all_tasks.isPressed() && !ui.exit_app.isPressed() && 
-        ui.task_spinner.getSelectedItemPosition() === 0 && ui.method_spinner.getSelectedItemPosition() === 0) {
-        toast("20秒内未操作，自动执行所有任务");
-        threads.start(function() {
-            taskManager.checkAndRunTasks();
-        });
-    }
-}, 20000);
-
 // 测试调试使用
 // threads.start(function() {
-//     taskManager.runTask("kuaishou")
+//     taskManager.runTask("kuaishou", ["看广告得金币"])
 // })
