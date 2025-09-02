@@ -59,6 +59,9 @@ module.exports = {
                     logger.log("启动应用失败");
                     return;
                 }
+                if (textMatches(/.AutoJs6.想要打开.*/, 1000)) {
+                    text("允许").click();
+                }
             }
             // 启动应用后等待一段时间
             sleep(3000)
