@@ -4,6 +4,16 @@
 
 这是一个基于 AutoJs6 的自动化脚本项目，旨在通过模拟用户操作，实现手机应用的自动化任务。
 
+## 环境要求
+
+**Shizuku**: 需要安装APP  
+
+[Shizuku地址](https://github.com/RikkaApps/Shizuku)  
+
+使用 https://docs.autojs6.com/#/shizuku ，用于授予 AutoJs6 "修改安全设置"，"投影媒体"，"无障碍服务" 权限
+
+使用无线启动Shizuku：https://shizuku.rikka.app/zh-hans/guide/setup/#%E9%80%9A%E8%BF%87%E6%97%A0%E7%BA%BF%E8%B0%83%E8%AF%95%E5%90%AF%E5%8A%A8
+
 ## 安装与运行
 
 1. **安装AutoJs6**：
