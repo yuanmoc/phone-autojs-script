@@ -1,7 +1,7 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("taobao");
 const appOperator = require("../core/operator.js");
-const { clickByText, closeApp, clickWidget } = appOperator;
+const { clickByText, clickByOCR, clickWidget } = appOperator;
 
 
 function 淘金币抵() {
@@ -10,7 +10,7 @@ function 淘金币抵() {
     clickByText("我的淘宝")
 
     sleep(config.baseDelay * 2);
-    if (!clickByText("淘金币抵", 1)) {
+    if (!clickByText("淘金币抵", { parentLevel: 1 })) {
         return;
     }
 
@@ -20,7 +20,7 @@ function 淘金币抵() {
 function 红包签到() {
     复位到首页()
     sleep(config.baseDelay * 2);
-    if (!clickByText("红包签到", 2)) {
+    if (!clickByText("红包签到", { parentLevel: 2 })) {
         return;
     }
     sleep(config.baseDelay * 2);
@@ -58,7 +58,28 @@ function 红包签到() {
             clickByText("提现到支付宝")
         }
     }
+    if(textMatches(/现金奖励.*/).exists()) {
+        if(clickByText(/现金奖励.*/)) {
+            clickByText("提现到支付宝")
+        }
+    }
+    // 关闭弹窗
+    // 尝试3次点击关闭按钮
+    for(let i = 0; i < 3; i++) {
+        if (text("关闭").exists()) {
+            if(clickWidget(text("关闭"))) {
+                break;
+            }
+            sleep(1000);
+        }
+    }
 
+    if(clickByOCR("去打卡")) {
+        sleep(config.baseDelay * 2);
+        clickByOCR("去打卡")
+        sleep(config.baseDelay * 2);
+        back();
+    }
 }
 
 function 复位到首页() {
@@ -68,6 +89,7 @@ function 复位到首页() {
             sleep(5000)
             复位到首页()
         }
+
     } else {
         back()
         sleep(5000)

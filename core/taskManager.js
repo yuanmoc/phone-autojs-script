@@ -1,6 +1,6 @@
 const appConfig = require("../config/appConfig.js");
 const logger = require("./logger.js")("taskManager");
-const {closeApp, openMiniProgram} = require("./operator.js");
+const {closeApp, clickByText, openMiniProgram} = require("./operator.js");
 
 let tasks = [];
 
@@ -60,7 +60,7 @@ module.exports = {
                     return;
                 }
                 if (textMatches(/.AutoJs6.想要打开.*/, 1000)) {
-                    text("允许").click();
+                    clickByText("允许")
                 }
             }
             // 启动应用后等待一段时间
@@ -68,14 +68,17 @@ module.exports = {
             // 2. 执行任务
             // 默认执行全部
             if (!funNameArr) {
+                logger.log(`任务 ${taskId} 未指定函数，默认执行全部`);
                 funNameArr = task.fun
             }
             for (let funName of funNameArr) {
                 if (typeof funName === 'function') {
                     logger.log(`执行函数 ${funName.name}`);
+                    logger.updateMethod(funName.name)
                     funName();
                 } else if (typeof funName === 'string') {
                     logger.log(`执行字符串函数 ${funName}`);
+                    logger.updateMethod(funName)
                     // 根据名称查找方法，并执行
                     let methodKey = Object.keys(task.fun).find(key => task.fun[key].name === funName);
                     if (methodKey) {

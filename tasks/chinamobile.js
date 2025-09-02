@@ -1,15 +1,22 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("chinamobile");
 const appOperator = require("../core/operator.js");
-const { clickByText, clickByMatches, closeApp } = appOperator;
+const { clickByText, clickByOCR } = appOperator;
 
 
 function 去签到() {
-    clickByMatches(/\d+\s?跳过/);
+    if(textMatches(/\d+\s?跳过/).exists()) {
+        clickByText(/\d+\s?跳过/);
+    }
 
     // 关闭广告
     sleep(config.baseDelay * 2);
-    clickByText("iv_close_top")
+    if (id("iv_close_top").exists()) {
+        clickByText("iv_close_top")
+    }
+    if (id("close_btn").exists()) {
+        clickByText("close_btn");
+    }
 
     if (!clickByText("我的")) {
         return;
@@ -20,8 +27,9 @@ function 去签到() {
     clickByText("float_window_img");
 
     sleep(config.baseDelay*5);
-    if (!clickByText("本月已累计签到：", 3, 1/2, 4/5)) {
-        logger.log("未找到签到按钮");
+
+    if (clickByOCR("立即签到")) {
+        clickByText("是");
     }
     sleep(config.baseDelay*5);
 }

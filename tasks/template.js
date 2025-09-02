@@ -1,7 +1,7 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("template");
 const appOperator = require("../core/operator.js");
-const { clickByText, clickByMatches, swipeTop } = appOperator;
+const { clickByText, swipeTop } = appOperator;
 
 
 function 无限向上滑动() {

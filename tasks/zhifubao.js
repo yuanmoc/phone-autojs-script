@@ -1,7 +1,7 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("zhifubao");
 const appOperator = require("../core/operator.js");
-const { clickByText, clickWidget, swipeTop, getTextsUnderNode, closePopup,closeApp } = appOperator;
+const { clickByText, clickWidget, swipeTop, getNodeText, closePopup,clickByOCR } = appOperator;
 
 function 去签到() {
     复位到视频红包页面()
@@ -29,7 +29,7 @@ function 浏览广告领红包() {
     复位到视频红包页面()
     let list = text("去看看").find(2000);
     for (let i = 0; i < list.length; i++) {
-        let content = getTextsUnderNode(list[i], 2)
+        let content = getNodeText(list[i], 2)
         if (content.indexOf("浏览广告领红包") === -1) {
             continue;
         }
@@ -52,7 +52,7 @@ function 去看看() {
         sleep(1000)
         let list = text("去看看").find(2000);
         for (let i = 0; i < list.length; i++) {
-            let content = getTextsUnderNode(list[i], 2)
+            let content = getNodeText(list[i], 2)
             if (content.indexOf("浏览广告领红包") !== -1) {
                 sleep(1000)
                 continue;
@@ -104,13 +104,12 @@ function 复位到视频页面() {
 }
 
 function 复位到视频红包页面() {
-    if (text("使用红包").exists()) {
-        return;
-    }
     复位到视频页面()
     sleep(1000)
     clickByText('suspendLayout')
-    sleep(8000)
+    sleep(4000)
+    clickByOCR("领取今日现金")
+    sleep(1000)
 }
 
 module.exports = {
@@ -119,7 +118,7 @@ module.exports = {
     fun: [
         去领取去预约,
         去签到,
-        去看看,
+        // 去看看, 不能领取总的红包里，都是单个小红包
         浏览广告领红包,
         刷视频,
     ]

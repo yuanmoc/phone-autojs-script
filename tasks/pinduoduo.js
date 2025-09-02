@@ -1,7 +1,7 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("pinduoduo");
 const appOperator = require("../core/operator.js");
-const { clickByText, clickByMatches, clickWidget, swipeLeft, swipeTop, closePopup, closeApp, getTextsUnderNode } = appOperator;
+const { clickByText, clickWidget, swipeLeft, swipeTop, closePopup, getNodeText } = appOperator;
 
 
 function 领取今日现金() {
@@ -16,7 +16,7 @@ function 领取今日现金() {
 
 function 关闭继续来赚钱弹窗() {
     if (textMatches(/.*继续来赚钱/).exists()) {
-        if (clickByMatches(/.*继续来赚钱/)) {
+        if (clickByText(/.*继续来赚钱/)) {
             sleep(config.baseDelay * 2);
         }
     }
@@ -48,12 +48,12 @@ function 去逛逛(_text) {
     复位到金币页面()
     sleep(1000)
 
-    let content = getTextsUnderNode(text(_text).findOne(2000), 1)
+    let content = getNodeText(text(_text).findOne(2000), 1)
     if(content.indexOf("去逛逛") === -1) {
         return;
     }
 
-    if(clickByText(_text, 1, 9/10, 1/2, 5000)) {
+    if(clickByText(_text, {parentLevel:1, offsetXRatio:9/10, timeout: 5000})) {
         let startTime = new Date().getTime();
         while (new Date().getTime() - startTime < 66 * 1000) {
             sleep(config.baseDelay * 5);
@@ -94,7 +94,7 @@ function 去领取() {
     if (text("去领取").exists()) {
         if (clickByText("去领取")) {
             sleep(config.baseDelay * 2);
-            clickByMatches(/喝水打卡领\d+金币/)
+            clickByText(/喝水打卡领\d+金币/)
             sleep(config.baseDelay * 2);
             let startTime = new Date().getTime();
             while (new Date().getTime() - startTime < 2 * 62 * 1000) {
@@ -107,17 +107,22 @@ function 去领取() {
 }
 
 function 复位到金币页面() {
+    if (text("我的金币").exists() && text("我的现金").exists()) {
+        return;
+    }
     if (text("多多视频").exists()) {
         if (!clickByText("多多视频")) {
             back()
             sleep(1000)
             复位到金币页面()
+            return;
         }
         sleep(1000)
-        if (!clickByText("金币", 1, 1/2, 1/2, 1000)) {
+        if (!clickByText("金币", {parentLevel: 1, timeout:1000})) {
             back()
             sleep(1000)
             复位到金币页面()
+            return;
         }
     } else if (text("推荐").exists()) {
         clickByText("推荐")
@@ -125,10 +130,12 @@ function 复位到金币页面() {
         sleep(1000)
         复位到金币页面()
         sleep(1000)
+        return;
     } else {
         back()
         sleep(1000)
         复位到金币页面()
+        return;
     }
 }
 

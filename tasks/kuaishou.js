@@ -1,7 +1,7 @@
 const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("kuaishou");
 const appOperator = require("../core/operator.js");
-const { clickByText, clickByMatches, swipeTop, closeApp, scrollDownFindElement } = appOperator;
+const { clickByText, swipeTop, scrollDownFindText } = appOperator;
 
 
 function 立即签到() {
@@ -40,7 +40,7 @@ function 去走路() {
     sleep(1000)
     if (clickByText("去走路")) {
         sleep(1000)
-        clickByMatches(/领取\d+金币/)
+        clickByText(/领取\d+金币/)
         sleep(1000)
         back()
     }
@@ -52,7 +52,7 @@ function 去领取() {
     sleep(1000)
     if (clickByText("去领取")) {
         sleep(1000)
-        clickByMatches(/领取饭补\d+金币/)
+        clickByText(/领取饭补\d+金币/)
         sleep(1000)
         back()
     }
@@ -80,7 +80,7 @@ function 看指定视频赚金币() {
     clickByText("海量金币")
     sleep(1000)
 
-    if (clickByText("看指定视频赚金币", 2, 9 / 10, 1 / 2)) {
+    if (clickByText("看指定视频赚金币", {parentLevel:2, offsetXRatio: 9/10})) {
         // 运行10分钟
         let endTime = new Date().getTime() + 10 * 60 * 1000;
         while (new Date().getTime() < endTime) {
@@ -100,7 +100,7 @@ function 立即领取() {
     复位去赚钱()
     clickByText("海量金币")
     sleep(2000)
-    clickByMatches(/.*立即领取/)
+    clickByText(/.*立即领取/)
 }
 
 
@@ -123,11 +123,11 @@ function 刷广告视频赚金币() {
     复位去赚钱()
     clickByText("猜你喜欢")
     sleep(1000)
-    if (!scrollDownFindElement("刷广告视频赚金币")) {
+    if (!scrollDownFindText("刷广告视频赚金币")) {
         return;
     }
     sleep(1000)
-    if (clickByText("刷广告视频赚金币", 2, 9 / 10, 1 / 2)) {
+    if (clickByText("刷广告视频赚金币", {parentLevel:2, offsetXRatio: 9/10})) {
         for (let i = 0; i < 100; i++) {
             swipeTop()
             sleep(5000)
@@ -170,6 +170,7 @@ module.exports = {
     appName: "快手极速版",    // 任务名称
     priority: 2,             // 优先级
     fun: [
+        立即签到,
         去点赞,
         去打卡,
         去走路,

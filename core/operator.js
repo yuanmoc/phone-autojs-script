@@ -27,15 +27,18 @@ function closeApp(appName) {
     logger.log(`${appName}关闭失败`)
     return false;
 }
+
 /**
  * 点击指定控件的第几层父控件的 x,y位置
  * @param {object} widget 控件对象
- * @param {number} parentLevel 父控件层级 (0表示当前控件，1表示父控件，以此类推)
- * @param {number} offsetXRatio 相对于父控件宽度的x轴比例 (0-1之间)
- * @param {number} offsetYRatio 相对于父控件高度的y轴比例 (0-1之间)
+ * @param options
+ * @param {number} options.parentLevel 父控件层级 (0表示当前控件，1表示父控件，以此类推)
+ * @param {number} options.offsetXRatio 相对于父控件宽度的x轴比例 (0-1之间)
+ * @param {number} options.offsetYRatio 相对于父控件高度的y轴比例 (0-1之间)
  * @returns {boolean} 是否成功点击
  */
-function clickWidget(widget, parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2) {
+function clickWidget(widget, options={}) {
+    const {parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2} = options
     if(!widget) {
         return false;
     }
@@ -56,6 +59,7 @@ function clickWidget(widget, parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2) 
         let bounds = parent.bounds();
         let clickX = bounds.left + (bounds.right - bounds.left) * offsetXRatio;
         let clickY = bounds.top + (bounds.bottom - bounds.top) * offsetYRatio;
+        logger.log("点击位置: " + clickX + ", " + clickY)
         return click(clickX, clickY);
     }
     return false;
@@ -64,46 +68,112 @@ function clickWidget(widget, parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2) 
 /**
  * 点击指定文本的控件的第几层父控件的 x,y位置
  * @param {string} _text 控件文本
- * @param {number} parentLevel 父控件层级 (0表示当前控件，1表示父控件，以此类推)
- * @param {number} offsetXRatio 相对于父控件宽度的x轴比例 (0-1之间)
- * @param {number} offsetYRatio 相对于父控件高度的y轴比例 (0-1之间)
- * @param {number} timeout 查找控件超时时间
+ * @param options
+ * @param {number} options.parentLevel 父控件层级 (0表示当前控件，1表示父控件，以此类推)
+ * @param {number} options.offsetXRatio 相对于父控件宽度的x轴比例 (0-1之间)
+ * @param {number} options.offsetYRatio 相对于父控件高度的y轴比例 (0-1之间)
+ * @param {number} options.timeout 查找控件超时时间
+ * @param {string} options.type 控件类型 id, text, desc
+ * @returns {boolean} 是否成功点击
  */
-function clickByMatches(_text, parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2, timeout = 500) {
-    // 等待几秒
+function clickByText(_text, options={}) {
+    const {parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2, timeout = 500, type=null} = options
     logger.log("尝试点击'" + _text + "'按钮")
-    var widget = textMatches(_text).findOne(timeout) || descMatches(_text).findOne(timeout) || idMatches(_text).findOne(timeout);
+    var widget = null;
+    var matchRegex = /^[a-zA-Z_\-]+$/
+    if (_text instanceof RegExp) {
+        if (type === 'id') {
+            widget = idMatches(_text).findOne(timeout);
+        } else if (type === 'text') {
+            widget = textMatches(_text).findOne(timeout);
+        } else if (type === 'desc') {
+            widget = descMatches(_text).findOne(timeout);
+        } else {
+            // 如果_text是英文的话，则使用id()查找控件
+            if (matchRegex.test(_text)) {
+                widget = idMatches(_text).findOne(timeout)
+            }
+            if (!widget) {
+                widget = descMatches(_text).findOne(timeout) || textMatches(_text).findOne(timeout);
+            }
+        }
+    } else {
+        if (type === 'id') {
+            widget = id(_text).findOne(timeout);
+        } else if (type === 'text') {
+            widget = text(_text).findOne(timeout);
+        } else if (type === 'desc') {
+            widget = desc(_text).findOne(timeout);
+        } else {
+            // 如果_text是英文的话，则使用id()查找控件
+            if (matchRegex.test(_text)) {
+                widget = id(_text).findOne(timeout)
+            }
+            if (!widget) {
+                widget = desc(_text).findOne(timeout) || text(_text).findOne(timeout);
+            }
+        }
+    }
+
     if (! widget) {
         logger.log("没找到'" + _text + "'控件")
         return false;
     }
-    return clickWidget(widget, parentLevel, offsetXRatio, offsetYRatio);
+    return clickWidget(widget, {parentLevel, offsetXRatio, offsetYRatio});
+}
+
+function findTextByOCR(_text) {
+    // OCR时先隐藏提示
+    logger.hideTip();
+    logger.log(`尝试识别'${_text}'文本`)
+    let isMatch = _text instanceof RegExp
+    let ocrResult = ocr.detect()
+    logger.showTip();
+    for (let i = 0; i < ocrResult.length; i++) {
+        if (isMatch && _text.test(ocrResult[i].label)) {
+            return ocrResult[i];
+        }
+        if (!isMatch && ocrResult[i].label.includes(_text)) {
+            return ocrResult[i];
+        }
+    }
+    // debug 可以打开调试
+    let texts = ocrResult.map(item => item.label).join(' ');
+    logger.log("OCR识别结果文本:\n" + texts);
+    return null;
 }
 
 /**
- * 点击指定文本的控件的第几层父控件的 x,y位置
- * @param {string} _text 控件文本
- * @param {number} parentLevel 父控件层级 (0表示当前控件，1表示父控件，以此类推)
- * @param {number} offsetXRatio 相对于父控件宽度的x轴比例 (0-1之间)
- * @param {number} offsetYRatio 相对于父控件高度的y轴比例 (0-1之间)
- * @param {number} timeout 查找控件超时时间
- * @returns {boolean} 是否成功点击
+ * 通过OCR识别文本
+ * @param _text
+ * @param options
+ * @param {number} options.offsetXRatio 相对于父控件宽度的x轴比例 (0-1之间)
+ * @param {number} options.offsetYRatio 相对于父控件高度的y轴比例 (0-1之间)
+ * @returns {boolean|*}
  */
-function clickByText(_text, parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2, timeout = 500) {
-    logger.log("尝试点击'" + _text + "'按钮")
-    // 如果_text是英文的话，则使用text()查找控件
-    var widget
-    if (/^[a-zA-Z_\-]+$/.test(_text)) {
-        widget = id(_text).findOne(timeout)
-    }
-    if (!widget) {
-        widget = desc(_text).findOne(timeout) || text(_text).findOne(timeout);
-    }
-    if (! widget) {
-        logger.log("没找到'" + _text + "'控件")
+function clickByOCR(_text, options = {}) {
+    logger.log(`尝试OCR点击'${_text}'文本`)
+    const { offsetXRatio = 1/2, offsetYRatio = 1/2 } = options;
+    let res = findTextByOCR(_text)
+    if (!res) {
+        logger.log("没找到'" + _text + "'文本")
         return false;
     }
-    return clickWidget(widget, parentLevel, offsetXRatio, offsetYRatio);
+    logger.log("尝试点击'" + _text + "'按钮")
+    let bounds = res.bounds; //属性
+    let clickX = bounds.left + (bounds.right - bounds.left) * offsetXRatio;
+    let clickY = bounds.top + (bounds.bottom - bounds.top) * offsetYRatio;
+
+    // 在点击位置显示红点
+    let redDot = floaty.window(
+        <frame gravity="center" bg="#FF0000" w="10" h="10" cornerRadius="5"/>
+    );
+    redDot.setPosition(clickX - 5, clickY - 5);
+    setTimeout(() => {
+        redDot.close();
+    }, 500);
+    logger.log("点击位置: " + clickX + ", " + clickY)
+    return click(clickX, clickY);
 }
 
 /**
@@ -112,7 +182,7 @@ function clickByText(_text, parentLevel=0, offsetXRatio=1/2, offsetYRatio=1/2, t
  * @param parentLevel
  * @returns {string}
  */
-function getTextsUnderNode(node, parentLevel=0) {
+function getNodeText(node, parentLevel=0) {
     let content = "";
     let parent = node;
 
@@ -129,7 +199,7 @@ function getTextsUnderNode(node, parentLevel=0) {
         for (let i = 0; i < parent.childCount(); i++) {
             let child = parent.child(i);
             if (child.childCount() > 0) {
-                content = content + getTextsUnderNode(child);
+                content = content + getNodeText(child);
             } else {
                 if (child.text()) {
                     content = content + child.text().trim();
@@ -149,31 +219,15 @@ function getTextsUnderNode(node, parentLevel=0) {
  * @param maxScrolls 下滑次数
  * @returns {boolean}
  */
-function scrollDownFindElement(_text, maxScrolls = 3) {
+function scrollDownFindText(_text, maxScrolls = 3) {
     let scrolls = 0;
     while (scrolls < maxScrolls) {
-        if (_text instanceof RegExp) {
-            // 提取正则表达式字面量
-            if (textMatches(_text).exists() && textMatches(_text).findOne().visibleToUser()) {
-                logger.log("通过正则找到元素：" + _text);
-                return true;
-            }
-            if (descMatches(_text).exists() && descMatches(_text).findOne().visibleToUser()) {
-                logger.log("通过正则找到元素：" + _text);
-                return true;
-            }
-        } else {
-            if (text(_text).exists() && text(_text).findOne().visibleToUser()) {
-                logger.log("找到元素：" + _text);
-                return true;
-            }
-            if (desc(_text).exists() && desc(_text).findOne().visibleToUser()) {
-                logger.log("找到元素：" + _text);
-                return true;
-            }
+        if (findTextByOCR(_text)) {
+            logger.log("通过OCR找到元素：" + _text);
+            return true;
         }
         swipe(device.width / 2, device.height / 2, device.width / 2, device.height / 8, 500)
-        sleep(1000);
+        sleep(2000);
         scrolls++;
     }
     logger.log("未找到元素：" + _text);
@@ -271,11 +325,12 @@ function rejectMiniProgramMessageRequest() {
 
 module.exports = {
     closeApp,
-    clickByMatches,
     clickByText,
     clickWidget,
-    getTextsUnderNode,
-    scrollDownFindElement,
+    findTextByOCR,
+    clickByOCR,
+    getNodeText,
+    scrollDownFindText,
     closePopup,
     swipeRight,
     swipeLeft,
