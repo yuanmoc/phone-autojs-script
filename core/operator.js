@@ -165,13 +165,13 @@ function clickByOCR(_text, options = {}) {
     let clickY = bounds.top + (bounds.bottom - bounds.top) * offsetYRatio;
 
     // 在点击位置显示红点
-    let redDot = floaty.window(
-        <frame gravity="center" bg="#FF0000" w="10" h="10" cornerRadius="5"/>
-    );
-    redDot.setPosition(clickX - 5, clickY - 5);
-    setTimeout(() => {
-        redDot.close();
-    }, 500);
+    // let redDot = floaty.window(
+    //     <frame gravity="center" bg="#FF0000" w="10" h="10" cornerRadius="5"/>
+    // );
+    // redDot.setPosition(clickX - 5, clickY - 5);
+    // setTimeout(() => {
+    //     redDot.close();
+    // }, 300);
     logger.log("点击位置: " + clickX + ", " + clickY)
     return click(clickX, clickY);
 }

@@ -6,12 +6,13 @@ const { clickByText, clickByOCR, swipeTop, swipeBottom, swipeLeft, scrollDownFin
 
 function 签到() {
     复位到赚钱页面()
-    // TODO: 文本不确定
     if (!scrollDownFindText(/已连续签到\d+天/, 8)) {
         return
     }
     if (clickByText(/已连续签到\d+天/, { parentLevel: 1 })) {
-        sleep(3000)
+        sleep(2000)
+        clickByOCR("签到领")
+        sleep(1000)
     }
     back()
 }
@@ -25,7 +26,7 @@ function 回归现金福利() {
 
 function 一键领金币() {
     复位到赚钱页面()
-    if (clickByText(/.*可一键领取/, { parentLevel: 1 })) {
+    if (clickByOCR("一键领金币")) {
         sleep(1000)
         if (clickByText("立即领现金")) {
             if (clickByText("一键领取")) {
@@ -42,6 +43,9 @@ function 一键领金币() {
             }
         }
     }
+    sleep(1000)
+    clickByOCR("预约领金币")
+    sleep(1000)
 }
 
 function 打卡领华为手机() {
@@ -85,11 +89,13 @@ function 看广告赚金币() {
         return;
     }
     if (clickByOCR(/(看广告賺金币|看广告赚金币)/)) {
+        sleep(1000)
         设置获取广告时间()
         back()
         back()
         sleep(1000)
         while (clickByText("领取奖励")) {
+            sleep(1000)
             设置获取广告时间()
             if (!textContains("领取成功")) {
                 back()
