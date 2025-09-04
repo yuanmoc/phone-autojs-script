@@ -127,6 +127,7 @@ function findTextByOCR(_text) {
     logger.hideTip();
     logger.log(`尝试识别'${_text}'文本`)
     let isMatch = _text instanceof RegExp
+    ocr.mode = 'paddle';
     let ocrResult = ocr.detect()
     logger.showTip();
     for (let i = 0; i < ocrResult.length; i++) {
@@ -217,21 +218,37 @@ function getNodeText(node, parentLevel=0) {
  * 下滑查找元素，如果出现则停止，否则继续下滑，最大下滑几个屏幕高
  * @param _text
  * @param maxScrolls 下滑次数
- * @returns {boolean}
+ * @returns
  */
 function scrollDownFindText(_text, maxScrolls = 3) {
     let scrolls = 0;
     while (scrolls < maxScrolls) {
-        if (findTextByOCR(_text)) {
+        let widget = findTextByOCR(_text)
+        if (widget) {
             logger.log("通过OCR找到元素：" + _text);
-            return true;
+            return widget;
         }
         swipe(device.width / 2, device.height / 2, device.width / 2, device.height / 8, 500)
         sleep(2000);
         scrolls++;
     }
     logger.log("未找到元素：" + _text);
-    return false;
+    return null;
+}
+
+function isDeviceCenter(widget, ratio = 0.5) {
+    if (!widget || !widget.bounds) return false;
+    let rect = widget.bounds();
+    let screenWidth = device.width;
+    let screenHeight = device.height;
+    let centerXStart = screenWidth * (0.5 - ratio / 2);
+    let centerXEnd = screenWidth * (0.5 + ratio / 2);
+    let centerYStart = screenHeight * (0.5 - ratio / 2);
+    let centerYEnd = screenHeight * (0.5 + ratio / 2);
+    let elemCenterX = rect.left + (rect.right - rect.left) / 2;
+    let elemCenterY = rect.top + (rect.bottom - rect.top) / 2;
+    return elemCenterX >= centerXStart && elemCenterX <= centerXEnd &&
+        elemCenterY >= centerYStart && elemCenterY <= centerYEnd;
 }
 
 /**
@@ -239,12 +256,19 @@ function scrollDownFindText(_text, maxScrolls = 3) {
 * @returns {boolean} 是否成功关闭弹窗
 */
 function closePopup() {
-    const list = className('android.widget.TextView').clickable().find().toArray()
-        .concat(className('android.widget.ImageView').clickable().find().toArray());
+    let timeout = 300
+    // 规则1：匹配常见关闭按钮文本（用正则覆盖多种文案）
+    let closeTexts = textMatches(/^(确定|取消|关闭|好的|X|我知道了|完成|跳过|稍后|以后再说|不再提示|忽略|拒绝)$/).find(timeout);
+    if (closeTexts && closeTexts.length > 0) {
+        closeTexts.forEach(btn => btn.click());
+        logger.log("通过文本关闭弹窗");
+        return;
+    }
+    let list = className('android.widget.TextView').clickable().find(timeout).toArray()
+        .concat(className('android.widget.ImageView').clickable().find(timeout).toArray());
     for (let i = 0; i < list.length; i++) {
         const item = list[i];
         if (!item.text() && item.visibleToUser()) {
-            logger.log("尝试关闭弹窗");
             if (item.click()) {
                 logger.log("尝试关闭弹窗，点击成功");
             }
@@ -330,6 +354,7 @@ module.exports = {
     findTextByOCR,
     clickByOCR,
     getNodeText,
+    isDeviceCenter,
     scrollDownFindText,
     closePopup,
     swipeRight,

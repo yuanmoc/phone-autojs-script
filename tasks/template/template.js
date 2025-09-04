@@ -1,6 +1,6 @@
-const config = require("../config/appConfig.js");
-const logger = require("../core/logger.js")("template");
-const appOperator = require("../core/operator.js");
+const config = require("../../config/appConfig.js");
+const logger = require("../../core/logger.js")("template");
+const appOperator = require("../../core/operator.js");
 const { clickByText, swipeTop } = appOperator;
 
 

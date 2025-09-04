@@ -1,6 +1,6 @@
-const config = require("../config/appConfig.js");
-const logger = require("../core/logger.js")("zhifubao");
-const appOperator = require("../core/operator.js");
+const config = require("../../config/appConfig.js");
+const logger = require("../../core/logger.js")("zhifubao");
+const appOperator = require("../../core/operator.js");
 const { clickByText, clickWidget, swipeTop, getNodeText, closePopup,clickByOCR } = appOperator;
 
 function 去签到() {

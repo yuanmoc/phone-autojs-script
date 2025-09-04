@@ -1,6 +1,6 @@
-const config = require("../config/appConfig.js");
-const logger = require("../core/logger.js")("pinduoduo");
-const appOperator = require("../core/operator.js");
+const config = require("../../config/appConfig.js");
+const logger = require("../../core/logger.js")("pinduoduo");
+const appOperator = require("../../core/operator.js");
 const { clickByText, clickWidget, swipeLeft, swipeTop, closePopup, getNodeText } = appOperator;
 
 
