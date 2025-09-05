@@ -127,6 +127,6 @@ ui.emitter.on("resume", () => {
 });
 
 // 测试调试使用
-// threads.start(function() {
-//     taskManager.runTask("kuaishou", ["看广告得金币"])
-// })
+threads.start(function() {
+    taskManager.runTask("xigua")
+})

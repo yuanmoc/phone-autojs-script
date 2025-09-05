@@ -1,4 +1,4 @@
-const appConfig = require('../config/appConfig.js');
+const {getConfig} = require('./config.js');
 
 // 创建悬浮窗,显示实时日志
 let floatyWindow = floaty.rawWindow(
@@ -45,7 +45,7 @@ function updateMethod(newMethod) {
 module.exports = function(tag='default') {
     return {
         log: function(message) {
-            if (appConfig.logEnabled) {
+            if (getConfig("logEnabled")) {
                 updateText(`${message}`)
                 console.log(`[${tag}] ${message}`)
             }

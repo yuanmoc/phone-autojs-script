@@ -1,11 +1,12 @@
-const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("kuaishou");
-const appOperator = require("../core/operator.js");
-const { clickByText, swipeTop, scrollDownFindText } = appOperator;
+const { clickByText, swipeTop, scrollDownFindText } = require("../core/operator.js");
+const {findTextByOCR, isDeviceCenter, clickWidget} = require("../core/operator");
 
 
 function 立即签到() {
     复位去赚钱()
+    clickByText("海量金币")
+    sleep(3000)
     clickByText("立即签到")
 }
 
@@ -66,7 +67,9 @@ function 看广告得金币() {
     for (let i = 0; i < 10; i++) {
         if (clickByText("看广告得金币")) {
             sleep(2000)
-            设置获取广告时间()
+            if (!设置获取广告时间()) {
+                return;
+            }
             back()
             sleep(1000)
             clickByText("close_view")
@@ -101,6 +104,7 @@ function 立即领取() {
     clickByText("海量金币")
     sleep(2000)
     clickByText(/.*立即领取/)
+    sleep(1000)
 }
 
 
@@ -147,15 +151,19 @@ function 设置获取广告时间() {
             let neo_count_down_seconds = neo_count_down_text.text().match(/\d+/g).map(Number);
             sleep_time = neo_count_down_seconds[0] * 60 + neo_count_down_seconds[1];
         }
-
     }
-    sleep_time = sleep_time || 62
-    logger.log("sleep_time: " + sleep_time)
-    sleep(sleep_time * 1000)
+    if (sleep_time) {
+        logger.log("sleep_time: " + sleep_time)
+        sleep(sleep_time * 1000)
+        return true;
+    }
+    return false;
 }
 
 
 function 复位去赚钱() {
+    // 关闭弹窗
+
     if (text("去赚钱").exists()) {
         clickByText("去赚钱")
         sleep(4000)

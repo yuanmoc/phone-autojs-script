@@ -1,15 +1,13 @@
-const config = require("../../config/appConfig.js");
 const logger = require("../../core/logger.js")("pinduoduo");
-const appOperator = require("../../core/operator.js");
-const { clickByText, clickWidget, swipeLeft, swipeTop, closePopup, getNodeText } = appOperator;
+const { clickByText, clickWidget, swipeLeft, swipeTop, closePopup, getNodeText } = require("../../core/operator.js");
 
 
 function 领取今日现金() {
     if (text("领取今日现金").exists()) {
         if (clickByText("领取今日现金")) {
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
             closePopup();
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
         }
     }
 }
@@ -17,7 +15,7 @@ function 领取今日现金() {
 function 关闭继续来赚钱弹窗() {
     if (textMatches(/.*继续来赚钱/).exists()) {
         if (clickByText(/.*继续来赚钱/)) {
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
         }
     }
 }
@@ -29,14 +27,14 @@ function 去阅读() {
     if (!clickByText("去阅读")) {
         return;
     }
-    sleep(config.baseDelay * 2);
+    sleep(1000 * 2);
     let books = className('android.support.v7.widget.RecyclerView').findOne(100);
     clickWidget(books)
-    sleep(config.baseDelay * 5);
+    sleep(1000 * 5);
     let startTime = new Date().getTime();
     while (new Date().getTime() - startTime < 2 * 60 * 1000) {
         swipeLeft();
-        sleep(config.baseDelay * 5);
+        sleep(1000 * 5);
     }
     back()
     back()
@@ -56,7 +54,7 @@ function 去逛逛(_text) {
     if(clickByText(_text, {parentLevel:1, offsetXRatio:9/10, timeout: 5000})) {
         let startTime = new Date().getTime();
         while (new Date().getTime() - startTime < 66 * 1000) {
-            sleep(config.baseDelay * 5);
+            sleep(1000 * 5);
             swipeTop();
         }
     }
@@ -79,10 +77,10 @@ function 去观看() {
     if (!clickByText("去观看")) {
         return;
     }
-    sleep(config.baseDelay * 2);
+    sleep(1000 * 2);
     let startTime = new Date().getTime();
     while (new Date().getTime() - startTime < 66 * 1000) {
-        sleep(config.baseDelay * 5);
+        sleep(1000 * 5);
         swipeTop();
     }
     back()
@@ -93,12 +91,12 @@ function 去领取() {
     复位到金币页面()
     if (text("去领取").exists()) {
         if (clickByText("去领取")) {
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
             clickByText(/喝水打卡领\d+金币/)
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
             let startTime = new Date().getTime();
             while (new Date().getTime() - startTime < 2 * 62 * 1000) {
-                sleep(config.baseDelay * 5);
+                sleep(1000 * 5);
                 swipeTop();
             }
             back()

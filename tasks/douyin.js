@@ -1,20 +1,17 @@
-const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("douyin");
-const appOperator = require("../core/operator.js");
-const { clickByText, clickByOCR, swipeTop, swipeBottom, swipeLeft, scrollDownFindText } = appOperator;
+const { clickByText, clickByOCR, clickWidget, swipeTop, swipeBottom, swipeLeft, scrollDownFindText } = require("../core/operator.js");
 
 
 function 签到() {
     复位到赚钱页面()
-    if (!scrollDownFindText(/已连续签到\d+天/, 8)) {
-        return
-    }
-    if (clickByText(/已连续签到\d+天/, { parentLevel: 1 })) {
+    let _已连续签到 = scrollDownFindText(/已连续签到\d+天/)
+    if (_已连续签到) {
+        clickWidget(_已连续签到)
         sleep(2000)
         clickByOCR("签到领")
         sleep(1000)
+        back()
     }
-    back()
 }
 
 function 回归现金福利() {
@@ -90,13 +87,17 @@ function 看广告赚金币() {
     }
     if (clickByOCR(/(看广告賺金币|看广告赚金币)/)) {
         sleep(1000)
-        设置获取广告时间()
+        if (!设置获取广告时间()) {
+            return;
+        }
         back()
         back()
         sleep(1000)
         while (clickByText("领取奖励")) {
             sleep(1000)
-            设置获取广告时间()
+            if (!设置获取广告时间()) {
+                return;
+            }
             if (!textContains("领取成功")) {
                 back()
             }
@@ -290,9 +291,9 @@ function 设置获取广告时间() {
         let sleep_time = content.match(/\d+/)[0];
         logger.log("sleep_time: "+ sleep_time)
         sleep(sleep_time * 1000)
+        return true
     } else {
-        sleep(40 * 1000)
-        logger.log("默认 sleep_time: 40")
+        return false
     }
 }
 

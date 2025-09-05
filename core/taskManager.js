@@ -1,6 +1,7 @@
-const appConfig = require("../config/appConfig.js");
+const {getConfig} = require("./config.js");
 const logger = require("./logger.js")("taskManager");
 const {closeApp, clickByText, openMiniProgram} = require("./operator.js");
+let { prepareEnv, resetEnv } = require("./system.js");
 
 let tasks = [];
 
@@ -31,7 +32,7 @@ module.exports = {
 
     checkAndRunTasks: function() {
         logger.log("任务管理器已启动");
-        sleep(appConfig.baseDelay); // 每次检查前的基础延迟
+        sleep(1000); // 每次检查前的基础延迟
         tasks.sort((a, b) => a.priority - b.priority).forEach(task => {
             logger.log(`${task.taskId} 准备执行任务: ${task.appName}`);
             this.runTask(task.taskId);
@@ -47,6 +48,8 @@ module.exports = {
         }
 
         try {
+            // 0. 设置环境
+            prepareEnv()
             // 1. 启动应用
             logger.log(`尝试启动${task.appName}`);
             if (task.miniProgram) {
@@ -95,12 +98,14 @@ module.exports = {
         } catch (e) {
             logger.log(`任务 ${task.appName} 执行异常: ${e.message}`);
         } finally {
-            if (appConfig.autoExit) {
+            if (getConfig("autoExit")) {
                 // 关闭应用
                 closeApp(task.appName)
                 home();
                 sleep(5000);
             }
+            // 重置环境
+            resetEnv()
         }
     }
 

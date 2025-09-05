@@ -1,0 +1,5 @@
+{
+  "logEnabled": true,          // 是否记录日志
+  "autoExit": false,           // 所有任务完成后是否自动退出
+  "screenLockPw": ""
+}

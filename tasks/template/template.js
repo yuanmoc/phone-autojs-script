@@ -1,13 +1,11 @@
-const config = require("../../config/appConfig.js");
 const logger = require("../../core/logger.js")("template");
-const appOperator = require("../../core/operator.js");
-const { clickByText, swipeTop } = appOperator;
+const { clickByText, swipeTop } = require("../../core/operator.js");
 
 
 function 无限向上滑动() {
     while (true) {
         swipeTop()
-        sleep(config.baseDelay * 5);
+        sleep(1000 * 5);
     }
 }
 

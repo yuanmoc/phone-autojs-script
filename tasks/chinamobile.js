@@ -1,7 +1,5 @@
-const config = require("../config/appConfig.js");
 const logger = require("../core/logger.js")("chinamobile");
-const appOperator = require("../core/operator.js");
-const { clickByText, clickByOCR } = appOperator;
+const { clickByText, clickByOCR } = require("../core/operator.js");
 
 
 function 去签到() {
@@ -10,7 +8,7 @@ function 去签到() {
     }
 
     // 关闭广告
-    sleep(config.baseDelay * 2);
+    sleep(1000 * 2);
     if (id("iv_close_top").exists()) {
         clickByText("iv_close_top")
     }
@@ -21,17 +19,27 @@ function 去签到() {
     if (!clickByText("我的")) {
         return;
     }
-    sleep(config.baseDelay);
+    sleep(1000);
 
     logger.log("尝试点击'签到'或相关按钮");
     clickByText("float_window_img");
 
-    sleep(config.baseDelay*5);
+    sleep(1000*5);
+    if (text("抽奖").exists()) {
+        clickByText("抽奖");
+        sleep(1000);
+        if (text("去使用").exists()) {
+            clickByText("去使用")
+            sleep(1000);
+            back();
+        }
+    }
+    sleep(1000);
 
     if (clickByOCR("立即签到")) {
         clickByText("是");
     }
-    sleep(config.baseDelay*5);
+    sleep(1000*5);
 }
 
 module.exports = {

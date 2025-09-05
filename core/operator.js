@@ -44,7 +44,7 @@ function clickWidget(widget, options={}) {
     }
     let parent = widget;
     for (let i = 0; i < parentLevel; i++) {
-        if (parent && parent.parent()) {
+        if (parent && typeof parent.parent === 'function' && parent.parent()) {
             parent = parent.parent();
         } else {
             logger.log("没找到控件的" + parentLevel + "层父控件")
@@ -52,14 +52,22 @@ function clickWidget(widget, options={}) {
         }
     }
     // 如果可以点击，优先使用点击事件
-    if (parent.clickable()) {
+    if (typeof parent.clickable === 'function' && parent.clickable()) {
         return parent.click();
     }
     if (parent) {
-        let bounds = parent.bounds();
+        let bounds = typeof parent.bounds === 'function' ? parent.bounds() : parent.bounds;
         let clickX = bounds.left + (bounds.right - bounds.left) * offsetXRatio;
         let clickY = bounds.top + (bounds.bottom - bounds.top) * offsetYRatio;
         logger.log("点击位置: " + clickX + ", " + clickY)
+        // 在点击位置显示红点
+        // let redDot = floaty.window(
+        //     <frame gravity="center" bg="#FF0000" w="10" h="10" cornerRadius="5"/>
+        // );
+        // redDot.setPosition(clickX - 5, clickY - 5);
+        // setTimeout(() => {
+        //     redDot.close();
+        // }, 300);
         return click(clickX, clickY);
     }
     return false;
@@ -122,7 +130,8 @@ function clickByText(_text, options={}) {
     return clickWidget(widget, {parentLevel, offsetXRatio, offsetYRatio});
 }
 
-function findTextByOCR(_text) {
+function findTextByOCR(_text, options={}) {
+    const { x0=0, y0=0, x1=device.width, y1=device.height } = options
     // OCR时先隐藏提示
     logger.hideTip();
     logger.log(`尝试识别'${_text}'文本`)
@@ -131,6 +140,12 @@ function findTextByOCR(_text) {
     let ocrResult = ocr.detect()
     logger.showTip();
     for (let i = 0; i < ocrResult.length; i++) {
+        // 中间点在区域内
+        let centerX = ocrResult[i].bounds.centerX();
+        let centerY = ocrResult[i].bounds.centerY();
+        if (centerX < x0 || centerX > x1 || centerY < y0 || centerY > y1) {
+            continue;
+        }
         if (isMatch && _text.test(ocrResult[i].label)) {
             return ocrResult[i];
         }
@@ -161,20 +176,7 @@ function clickByOCR(_text, options = {}) {
         return false;
     }
     logger.log("尝试点击'" + _text + "'按钮")
-    let bounds = res.bounds; //属性
-    let clickX = bounds.left + (bounds.right - bounds.left) * offsetXRatio;
-    let clickY = bounds.top + (bounds.bottom - bounds.top) * offsetYRatio;
-
-    // 在点击位置显示红点
-    // let redDot = floaty.window(
-    //     <frame gravity="center" bg="#FF0000" w="10" h="10" cornerRadius="5"/>
-    // );
-    // redDot.setPosition(clickX - 5, clickY - 5);
-    // setTimeout(() => {
-    //     redDot.close();
-    // }, 300);
-    logger.log("点击位置: " + clickX + ", " + clickY)
-    return click(clickX, clickY);
+    return clickWidget(res, {offsetXRatio: offsetXRatio, offsetYRatio: offsetYRatio});
 }
 
 /**
@@ -238,7 +240,7 @@ function scrollDownFindText(_text, maxScrolls = 3) {
 
 function isDeviceCenter(widget, ratio = 0.5) {
     if (!widget || !widget.bounds) return false;
-    let rect = widget.bounds();
+    let rect = typeof widget.bounds === 'function' ? widget.bounds() : widget.bounds;
     let screenWidth = device.width;
     let screenHeight = device.height;
     let centerXStart = screenWidth * (0.5 - ratio / 2);

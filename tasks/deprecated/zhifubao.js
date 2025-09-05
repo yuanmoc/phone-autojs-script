@@ -1,15 +1,13 @@
-const config = require("../../config/appConfig.js");
 const logger = require("../../core/logger.js")("zhifubao");
-const appOperator = require("../../core/operator.js");
-const { clickByText, clickWidget, swipeTop, getNodeText, closePopup,clickByOCR } = appOperator;
+const { clickByText, clickWidget, swipeTop, getNodeText, closePopup,clickByOCR } = require("../../core/operator.js");
 
 function 去签到() {
     复位到视频红包页面()
     if (text("去签到").exists()) {
         if(clickByText("去签到")) {
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
             clickByText("scroll_to_signIn")
-            sleep(config.baseDelay * 2);
+            sleep(1000 * 2);
             closePopup()
         }
     }
@@ -18,9 +16,9 @@ function 去签到() {
 function 去领取去预约() {
     复位到视频红包页面()
     if (clickByText("去领取")) {
-        sleep(config.baseDelay * 2);
+        sleep(1000 * 2);
         clickByText("去预约")
-        sleep(config.baseDelay * 2);
+        sleep(1000 * 2);
     }
 }
 
@@ -67,7 +65,7 @@ function 去看看() {
 function 立即领取() {
     if (text("立即领取").exists()) {
         clickByText("立即领取")
-        sleep(config.baseDelay * 2);
+        sleep(1000 * 2);
     }
 }
 
@@ -79,7 +77,7 @@ function 刷视频() {
 
     while (new Date().getTime() - startTime < duration) {
         swipeTop();
-        sleep(config.baseDelay * 10);
+        sleep(1000 * 10);
     }
 }
 
