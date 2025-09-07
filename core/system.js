@@ -1,6 +1,7 @@
 const {getConfig} = require("./config");
 const {swipeTop}= require("./operator");
-const {logger} = require("./logger")("system");
+const {openGKDApi, checkGKD} = require("./gkd");
+const logger = require("./logger")("system");
 
 function prepareEnv() {
   // 唤醒设备屏幕
@@ -33,6 +34,14 @@ function prepareEnv() {
     } else {
       _waitScreenLocked()
     }
+  }
+
+  // 打开gkd
+  openGKDApi();
+  if (!checkGKD()) {
+    logger.log('GKD启动失败！')
+  } else {
+    logger.log('GKD启动成功')
   }
 }
 

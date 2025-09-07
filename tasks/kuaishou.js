@@ -156,6 +156,7 @@ function _设置获取广告时间() {
 function _复位去赚钱() {
     // 关闭弹窗
 
+
     if (text("去赚钱").exists()) {
         clickByText("去赚钱")
         sleep(4000)
