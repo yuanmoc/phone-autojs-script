@@ -1,4 +1,4 @@
-const logger = require("../core/logger.js")("template");
+const logger = require("../core/logger.js")("xigua");
 const { findTextByOCR, clickByText, swipeTop, isDeviceCenter, closePopup, scrollDownFindText, clickByOCR, clickWidget} = require("../core/operator");
 
 function 签到() {

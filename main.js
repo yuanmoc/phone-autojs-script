@@ -7,11 +7,23 @@ taskManager.registerTasks();
 // 判断是否在UI模式下运行
 // UI 界面
 ui.layout(
-    <vertical padding="16">
+    <vertical padding="16" layout_height="match_parent">
         <text text="AutoJs6 任务管理器" textSize="24sp" textColor="black" gravity="center" margin="16"/>
-        <spinner id="task_spinner" layout_width="match_parent" layout_height="wrap_content"/>
-        <text/>
-        <spinner id="method_spinner" layout_width="match_parent" layout_height="wrap_content" margin_top="12" />
+        <horizontal layout_width="match_parent" layout_height="0dp" layout_weight="1">
+            <list id="task_list" >
+                <horizontal>
+                    <checkbox id="task_checkbox" checked="{{selected}}" layout_width="wrap_content" layout_height="wrap_content" margin="8"/>
+                    <text id="task_name" text="{{name}}" textColor="black" textSize="16sp" layout_width="match_parent" layout_height="wrap_content" padding="16"/>
+                </horizontal>
+            </list>
+
+            <list id="method_list" >
+                <horizontal>
+                    <checkbox id="method_checkbox" checked="{{selected}}" layout_width="wrap_content" layout_height="wrap_content" margin="8"/>
+                    <text id="method_name" text="{{name}}" textColor="black" textSize="16sp" layout_width="match_parent" layout_height="wrap_content" padding="16"/>
+                </horizontal>
+            </list>
+            </horizontal>
         <text/>
         <button id="run_selected_task" text="运行选定任务" layout_width="match_parent" layout_height="wrap_content" margin_top="16"/>
         <button id="run_all_tasks" text="运行所有任务" layout_width="match_parent" layout_height="wrap_content" margin_top="8"/>
@@ -19,87 +31,100 @@ ui.layout(
     </vertical>
 );
 
-const allTaskName = "全部任务"
 // 获取所有任务名称并填充到 Spinner
 const allTasks = taskManager.getAllTasks();
+let dataSource = allTasks.map((task, index) => ({
+    name: task.appName,
+    taskId: task.taskId,
+    index: index,
+    selected: true,
+    fun: task.fun,
+    selectedFun: task.fun
+}))
 
-ui.post(() => {
-    let taskNames = allTasks.map(task => task.appName || task.taskId);
-    // 如果没有任务，提供默认选项
-    let displayTaskNames = taskNames.length > 0 ? taskNames : ["暂无任务"];
+// 获取所有任务名称并填充到 ListView
+ui.task_list.setDataSource(dataSource);
+// 初始化方法 ListView
+updateMethodList(dataSource[0])
 
-    const taskAdapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, displayTaskNames);
-    ui.task_spinner.setAdapter(taskAdapter);
-    ui.task_spinner.setSelection(0);
 
-    // 设置 Spinner 下拉项的 padding
-    taskAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    const dropdownView = taskAdapter.getDropDownView(0, null, ui.task_spinner);
-    if (dropdownView) {
-        dropdownView.setPadding(20, 20, 20, 20);
-    }
-    
-    // 初始化方法Spinner
-    updateMethodSpinner(0);
-});
-
-// 根据选中的任务更新方法Spinner
-function updateMethodSpinner(taskIndex) {
-    const selectedTask = allTasks[taskIndex];
-    const displayMethodNames = (selectedTask.fun && Object.keys(selectedTask.fun).map(key => selectedTask.fun[key].name || key)) || [];
-    displayMethodNames.unshift(allTaskName);
-    
-    const methodAdapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, displayMethodNames);
-    ui.method_spinner.setAdapter(methodAdapter);
-    ui.method_spinner.setSelection(0);
-
-    // 设置 Spinner 下拉项的 padding
-    methodAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    const dropdownView = methodAdapter.getDropDownView(0, null, ui.method_spinner);
-    if (dropdownView) {
-        dropdownView.setPadding(20, 20, 20, 20);
+// 根据选中的任务更新方法 ListView
+function updateMethodList(item) {
+    if (item && item.fun) {
+        let displayMethod = item.fun.map((f, index) => ({
+            name: f.name,
+            index: index,
+            parentIndex: item.index,
+            selected:  item.selectedFun.some(sf => sf.name === f.name)
+        }))
+        ui.method_list.setDataSource(displayMethod);
+    } else {
+        ui.method_list.setDataSource([]);
     }
 }
 
-// 监听任务Spinner选择变化
-ui.task_spinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
-    onItemSelected: function(adapterView, view, position, id) {
-        console.log("当前选中的任务索引:", position);
-        updateMethodSpinner(position);
-    },
-    onNothingSelected: function(adapterView) {
-        // 未选择任何项时的处理
-    }
-}));
+// 监听任务 ListView 选择变化
+ui.task_list.on("item_bind", function(itemView, itemHolder){
+    itemView.task_checkbox.on("click", function(){
+        // 更新任务项的选中状态
+        if (itemView.task_checkbox.checked) {
+            dataSource[itemHolder.item.index].selected = true;
+            dataSource[itemHolder.item.index].selectedFun = itemHolder.item.fun;
+        } else {
+            dataSource[itemHolder.item.index].selected = false;
+            dataSource[itemHolder.item.index].selectedFun = [];
+        }
+        // 更新数据源
+        ui.task_list.setDataSource(dataSource);
+        // 更新方法列表显示
+        updateMethodList(itemHolder.item);
+    });
+    itemView.task_name.on("click", function(){
+        updateMethodList(itemHolder.item);
+        // 重置所有文字颜色为黑色
+        dataSource.forEach((item, index) => {
+            let itemView = ui.task_list.getChildAt(index);
+            if(itemView) {
+                itemView.task_name.setTextColor(colors.parseColor("#000000"));
+            }
+        });
+        // 设置当前点击的文字为蓝色
+        itemView.task_name.setTextColor(colors.parseColor("#2196F3"));
+    });
+})
+
+ui.method_list.on("item_bind", function(itemView, itemHolder){
+    itemView.method_checkbox.on("click", function(){
+        // 获取当前选中的任务项
+        if (itemView.method_checkbox.checked) {
+            let addFun = dataSource[itemHolder.item.parentIndex].fun[itemHolder.item.index]
+            dataSource[itemHolder.item.parentIndex].selectedFun.push(addFun);
+            dataSource[itemHolder.item.parentIndex].selected = true;
+        } else {
+            let removeFun = dataSource[itemHolder.item.parentIndex].fun[itemHolder.item.index];
+            let selectedFun = dataSource[itemHolder.item.parentIndex].selectedFun;
+            if (removeFun) {
+                 dataSource[itemHolder.item.parentIndex].selectedFun = selectedFun.filter(f => (f.name !== removeFun.name));
+                 if (dataSource[itemHolder.item.parentIndex].selectedFun.length === 0) {
+                    dataSource[itemHolder.item.parentIndex].selected = false;
+                }
+            }
+        }
+        // 更新数据源
+        ui.task_list.setDataSource(dataSource);
+    });
+})
 
 // 运行选定任务按钮点击事件
 ui.run_selected_task.click(function() {
-    const selectedIndex = ui.task_spinner.getSelectedItemPosition();
-    console.log("当前选中的任务索引:", selectedIndex);
-    const selectedMethodName = ui.method_spinner.getSelectedItem();
-    console.log("当前选中的方法名称:", selectedMethodName);
-
-    const selectedTask = allTasks[selectedIndex];
-    if (selectedTask) {
-        toast(`开始运行任务: ${selectedTask.appName || selectedTask.taskId}`);
-        // 在子线程中运行任务，避免阻塞UI线程
-        threads.start(function() {
-            if (selectedMethodName === allTaskName) {
-                taskManager.runTask(selectedTask.taskId, selectedTask.fun);
-            } else {
-                // 从selectedTask.fun中根据方法名称获取方法
-                const selectedMethodKey = Object.keys(selectedTask.fun).find(key => selectedTask.fun[key].name === selectedMethodName);
-                if (selectedMethodKey) {
-                    const selectedMethod = selectedTask.fun[selectedMethodKey];
-                    taskManager.runTask(selectedTask.taskId, [selectedMethod]);
-                } else {
-                    toast("未找到指定的方法");
-                }
+    toast("运行选定任务");
+    threads.start(function() {
+        dataSource.forEach(item => {
+            if (item.selected) {
+                taskManager.runTask(item.taskId, item.selectedFun);
             }
-        });
-    } else {
-        toast("请选择一个有效的任务");
-    }
+        })
+    });
 });
 
 // 运行所有任务按钮点击事件
@@ -116,17 +141,3 @@ ui.exit_app.click(function() {
     toast("退出应用");
     exit();
 });
-
-// 保持脚本运行，直到用户退出
-ui.emitter.on("pause", () => {
-    // 当UI暂停时，可以执行一些清理操作
-});
-
-ui.emitter.on("resume", () => {
-    // 当UI恢复时，可以执行一些恢复操作
-});
-
-// 测试调试使用
-threads.start(function() {
-    taskManager.runTask("xigua")
-})
