@@ -21,6 +21,25 @@ function 签到() {
 
 function 预约领金币() {
     _重置到首页()
+    let _一键领金币 = scrollDownFindText("一键领金币")
+    if (_一键领金币) {
+        clickWidget(_一键领金币)
+        sleep(1000 * 2);
+        let 一键领取 = findTextByOCR("一键领取")
+        if (一键领取) {
+            clickWidget(一键领取)
+            sleep(1000 * 2);
+            clickByOCR("开心收下")
+            sleep(1000 * 2);
+            clickByText("立即预约领取", {type: "text"})
+            sleep(1000 * 2);
+            clickByText("不用提醒我也能来", {type: "text"})
+            sleep(1000)
+            _领取奖励()
+        }
+    }
+
+    _重置到首页()
     let _预约领金币 = scrollDownFindText("预约领金币")
     if (_预约领金币) {
         clickWidget(_预约领金币)

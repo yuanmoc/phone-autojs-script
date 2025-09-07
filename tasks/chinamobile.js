@@ -1,5 +1,5 @@
 const logger = require("../core/logger.js")("chinamobile");
-const { clickByText, clickByOCR } = require("../core/operator.js");
+const {findTextByOCR, clickWidget, clickByText, clickByOCR, isDeviceCenter} = require("../core/operator");
 
 
 function 去签到() {
@@ -28,18 +28,24 @@ function 去签到() {
     if (text("抽奖").exists()) {
         clickByText("抽奖");
         sleep(1000);
-        if (text("去使用").exists()) {
-            clickByText("去使用")
-            sleep(1000);
-            back();
-        }
+        _去使用()
     }
-    sleep(1000);
+    _去使用()
 
     if (clickByOCR("立即签到")) {
         clickByText("是");
     }
     sleep(1000*5);
+}
+
+function _去使用() {
+    let 去使用 = findTextByOCR("去使用")
+    if (去使用 && isDeviceCenter(去使用)) {
+        clickWidget(去使用)
+        sleep(1000);
+        back();
+    }
+    sleep(1000);
 }
 
 module.exports = {

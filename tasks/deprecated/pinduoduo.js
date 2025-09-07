@@ -12,7 +12,7 @@ function 领取今日现金() {
     }
 }
 
-function 关闭继续来赚钱弹窗() {
+function _关闭继续来赚钱弹窗() {
     if (textMatches(/.*继续来赚钱/).exists()) {
         if (clickByText(/.*继续来赚钱/)) {
             sleep(1000 * 2);
@@ -21,8 +21,8 @@ function 关闭继续来赚钱弹窗() {
 }
 
 function 去阅读() {
-    关闭继续来赚钱弹窗()
-    复位到金币页面()
+    _关闭继续来赚钱弹窗()
+    _复位到金币页面()
     sleep(1000)
     if (!clickByText("去阅读")) {
         return;
@@ -38,12 +38,12 @@ function 去阅读() {
     }
     back()
     back()
-    关闭继续来赚钱弹窗()
+    _关闭继续来赚钱弹窗()
 }
 
 function 去逛逛(_text) {
-    关闭继续来赚钱弹窗()
-    复位到金币页面()
+    _关闭继续来赚钱弹窗()
+    _复位到金币页面()
     sleep(1000)
 
     let content = getNodeText(text(_text).findOne(2000), 1)
@@ -71,8 +71,8 @@ function 看短剧领金币() {
 }
 
 function 去观看() {
-    关闭继续来赚钱弹窗()
-    复位到金币页面()
+    _关闭继续来赚钱弹窗()
+    _复位到金币页面()
     sleep(1000)
     if (!clickByText("去观看")) {
         return;
@@ -87,8 +87,8 @@ function 去观看() {
 }
 
 function 去领取() {
-    关闭继续来赚钱弹窗()
-    复位到金币页面()
+    _关闭继续来赚钱弹窗()
+    _复位到金币页面()
     if (text("去领取").exists()) {
         if (clickByText("去领取")) {
             sleep(1000 * 2);
@@ -104,7 +104,7 @@ function 去领取() {
     }
 }
 
-function 复位到金币页面() {
+function _复位到金币页面() {
     if (text("我的金币").exists() && text("我的现金").exists()) {
         return;
     }
@@ -112,27 +112,27 @@ function 复位到金币页面() {
         if (!clickByText("多多视频")) {
             back()
             sleep(1000)
-            复位到金币页面()
+            _复位到金币页面()
             return;
         }
-        sleep(1000)
+        sleep(2000)
         if (!clickByText("金币", {parentLevel: 1, timeout:1000})) {
             back()
             sleep(1000)
-            复位到金币页面()
+            _复位到金币页面()
             return;
         }
     } else if (text("推荐").exists()) {
         clickByText("推荐")
         back()
         sleep(1000)
-        复位到金币页面()
+        _复位到金币页面()
         sleep(1000)
         return;
     } else {
         back()
         sleep(1000)
-        复位到金币页面()
+        _复位到金币页面()
         return;
     }
 }

@@ -1,17 +1,16 @@
 const logger = require("../core/logger.js")("kuaishou");
-const { clickByText, swipeTop, scrollDownFindText } = require("../core/operator.js");
-const {findTextByOCR, isDeviceCenter, clickWidget} = require("../core/operator");
+const { clickByText, swipeTop, scrollDownFindText } = require("../core/operator");
 
 
 function 立即签到() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("海量金币")
     sleep(3000)
     clickByText("立即签到")
 }
 
 function 去点赞() {
-    复位去赚钱()
+    _复位去赚钱()
     if (clickByText("去点赞")) {
         sleep(1000)
         clickByText("like_icon")
@@ -21,7 +20,7 @@ function 去点赞() {
 
 function 去打卡() {
     for (let i = 0; i < 2; i++) {
-        复位去赚钱()
+        _复位去赚钱()
         clickByText("海量金币")
         sleep(1000)
         if (clickByText("去打卡")) {
@@ -36,7 +35,7 @@ function 去打卡() {
 }
 
 function 去走路() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("轻松上手")
     sleep(1000)
     if (clickByText("去走路")) {
@@ -48,7 +47,7 @@ function 去走路() {
 }
 
 function 去领取() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("轻松上手")
     sleep(1000)
     if (clickByText("去领取")) {
@@ -60,34 +59,30 @@ function 去领取() {
 }
 
 function 看广告得金币() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("轻松上手")
     sleep(1000)
     // 循环10次领取福利
     for (let i = 0; i < 10; i++) {
         if (clickByText("看广告得金币")) {
             sleep(2000)
-            if (!设置获取广告时间()) {
-                return;
+            if (_设置获取广告时间()) {
+                back()
+                sleep(1000)
+                clickByText("close_view")
+                sleep(1000)
             }
-            back()
-            sleep(1000)
-            clickByText("close_view")
-            sleep(1000)
         }
     }
 }
 
 function 看指定视频赚金币() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("海量金币")
     sleep(1000)
-
     if (clickByText("看指定视频赚金币", {parentLevel:2, offsetXRatio: 9/10})) {
-        // 运行10分钟
-        let endTime = new Date().getTime() + 10 * 60 * 1000;
+        let endTime = new Date().getTime() + 5 * 60 * 1000;
         while (new Date().getTime() < endTime) {
-            // 循环10次上滑操作
             sleep(5000);
             swipeTop();
             // 直播直接跳过
@@ -100,7 +95,7 @@ function 看指定视频赚金币() {
 }
 
 function 立即领取() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("海量金币")
     sleep(2000)
     clickByText(/.*立即领取/)
@@ -109,37 +104,34 @@ function 立即领取() {
 
 
 function 看视频赚金币() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("轻松上手")
     sleep(1000)
-    if (clickByText("看视频赚金币", 2, 9 / 10, 1 / 2)) {
-        // 运行10分钟
-        let endTime = new Date().getTime() + 10 * 60 * 1000;
+    if (clickByText("看视频赚金币", {parentLevel:2, offsetXRatio:9 / 10})) {
+        let endTime = new Date().getTime() + 5 * 60 * 1000;
         while (new Date().getTime() < endTime) {
-            // 循环10次上滑操作
-            sleep(5000);
             swipeTop();
+            sleep(5000);
         }
     }
 }
 
 function 刷广告视频赚金币() {
-    复位去赚钱()
+    _复位去赚钱()
     clickByText("猜你喜欢")
     sleep(1000)
-    if (!scrollDownFindText("刷广告视频赚金币")) {
-        return;
-    }
-    sleep(1000)
-    if (clickByText("刷广告视频赚金币", {parentLevel:2, offsetXRatio: 9/10})) {
-        for (let i = 0; i < 100; i++) {
-            swipeTop()
-            sleep(5000)
+    if (scrollDownFindText("刷广告视频赚金币")) {
+        if (clickByText("刷广告视频赚金币", {parentLevel:2, offsetXRatio: 9/10})) {
+            let endTime = new Date().getTime() + 5 * 60 * 1000;
+            while (new Date().getTime() < endTime) {
+                swipeTop();
+                sleep(5000);
+            }
         }
     }
 }
 
-function 设置获取广告时间() {
+function _设置获取广告时间() {
     let sleep_time = null
     let video_countdown = id("video_countdown").findOne(5000)
     if (video_countdown) {
@@ -161,7 +153,7 @@ function 设置获取广告时间() {
 }
 
 
-function 复位去赚钱() {
+function _复位去赚钱() {
     // 关闭弹窗
 
     if (text("去赚钱").exists()) {
@@ -170,7 +162,7 @@ function 复位去赚钱() {
     } else {
         back()
         sleep(1000)
-        复位去赚钱()
+        _复位去赚钱()
     }
 }
 

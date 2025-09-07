@@ -2,7 +2,7 @@ const logger = require("../../core/logger.js")("zhifubao");
 const { clickByText, clickWidget, swipeTop, getNodeText, closePopup,clickByOCR } = require("../../core/operator.js");
 
 function 去签到() {
-    复位到视频红包页面()
+    _复位到视频红包页面()
     if (text("去签到").exists()) {
         if(clickByText("去签到")) {
             sleep(1000 * 2);
@@ -14,7 +14,7 @@ function 去签到() {
 }
 
 function 去领取去预约() {
-    复位到视频红包页面()
+    _复位到视频红包页面()
     if (clickByText("去领取")) {
         sleep(1000 * 2);
         clickByText("去预约")
@@ -24,7 +24,7 @@ function 去领取去预约() {
 
 
 function 浏览广告领红包() {
-    复位到视频红包页面()
+    _复位到视频红包页面()
     let list = text("去看看").find(2000);
     for (let i = 0; i < list.length; i++) {
         let content = getNodeText(list[i], 2)
@@ -45,7 +45,7 @@ function 浏览广告领红包() {
 
 function 去看看() {
     for (let j = 0; j < 8; j++) {
-        复位到视频红包页面()
+        _复位到视频红包页面()
         立即领取()
         sleep(1000)
         let list = text("去看看").find(2000);
@@ -70,10 +70,10 @@ function 立即领取() {
 }
 
 function 刷视频() {
-    复位到视频页面()
+    _复位到视频页面()
     sleep(1000)
     const startTime = new Date().getTime();
-    const duration = 10 * 60 * 1000; // 5分钟的毫秒数
+    const duration = 5 * 60 * 1000; // 5分钟的毫秒数
 
     while (new Date().getTime() - startTime < duration) {
         swipeTop();
@@ -81,7 +81,7 @@ function 刷视频() {
     }
 }
 
-function 复位到视频页面() {
+function _复位到视频页面() {
     if (text("发现").exists()) {
         clickByText("发现")
         sleep(2 * 1000)
@@ -97,12 +97,12 @@ function 复位到视频页面() {
     } else {
         back()
         sleep(1000)
-        复位到视频页面()
+        _复位到视频页面()
     }
 }
 
-function 复位到视频红包页面() {
-    复位到视频页面()
+function _复位到视频红包页面() {
+    _复位到视频页面()
     sleep(1000)
     clickByText('suspendLayout')
     sleep(4000)
