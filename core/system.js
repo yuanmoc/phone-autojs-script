@@ -14,7 +14,7 @@ function prepareEnv() {
   // 设置亮度调节模式为手动
   device.setBrightnessMode(0);
   // 设置屏幕亮度为10
-  device.setBrightness(10);
+  device.setBrightness(2);
   events.on('exit', function () {
     // 取消保持唤醒状态
     device.cancelKeepingAwake();

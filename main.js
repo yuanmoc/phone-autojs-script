@@ -141,3 +141,11 @@ ui.exit_app.click(function() {
     toast("退出应用");
     exit();
 });
+
+// 静默时直接跑定时任务
+if (!device.isScreenOn()) {
+    // 屏幕是不亮屏，直接跑任务
+    threads.start(function() {
+        taskManager.checkAndRunTasks();
+    });
+}
