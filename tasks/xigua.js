@@ -205,7 +205,7 @@ function _重置到首页() {
         if (clickByText("我的 标签", {type: "desc"})) {
             clickByText("现金", {type: "text"})
             sleep(2000)
-            // _看视频赚(1)
+            _看视频赚(1)
         }
     } else {
         back()

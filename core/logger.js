@@ -1,14 +1,12 @@
 const {getConfig} = require('./config.js');
 
-// 悬浮窗单例
-let floatyWindow = null;
-
 // 创建悬浮窗单例
 function createFloatyWindow() {
-    if (floatyWindow) return;
-    
+    if (global.floatyWindow) return;
+    // 打印出线程名称
+    console.log("createFloatyWindow: " + threads.currentThread().getName());
     // 创建悬浮窗,显示实时日志
-    floatyWindow = floaty.rawWindow(
+    global.floatyWindow = floaty.rawWindow(
         <frame id="root" gravity="center">
             <card cardCornerRadius="6dp" cardElevation="0dp" >
                 <horizontal padding="8 4" background="#CC000000">
@@ -34,27 +32,23 @@ function createFloatyWindow() {
         </frame>
     );
     // 设置悬浮窗位置和大小
-    floatyWindow.setPosition(device.width / 100, device.height / 200);
+    global.floatyWindow.setPosition(device.width / 100, device.height / 200);
 }
 
+// 全局创建
+createFloatyWindow();
 
 // 实时修改文字的函数
 function updateText(newText) {
-    createFloatyWindow();
-    // 打印出线程名称
-    // console.log(threads.currentThread().getName());
-
-    // 在主线程中更新UI
-    ui.run(() => {
-        floatyWindow.textView.setText(newText);
+    ui.post(() => {
+        global.floatyWindow.textView.setText(newText);
     });
 }
 function updateMethod(newMethod) {
-    ui.run(() => {
-        floatyWindow.methodView.setText(newMethod);
+    ui.post(() => {
+        global.floatyWindow.methodView.setText(newMethod);
     });
 }
-
 
 module.exports = function(tag='default') {
     return {
@@ -66,14 +60,14 @@ module.exports = function(tag='default') {
         },
         updateMethod: updateMethod,
         hideTip: function() {
-            ui.run(() => {
-                floatyWindow.root.setVisibility(android.view.View.INVISIBLE);
+            ui.post(() => {
+                global.floatyWindow.root.setVisibility(android.view.View.INVISIBLE);
             });
             sleep(500)
         },
         showTip: function() {
-            ui.run(() => {
-                floatyWindow.root.setVisibility(android.view.View.VISIBLE);
+            ui.post(() => {
+                global.floatyWindow.root.setVisibility(android.view.View.VISIBLE);
             });
         }
     };
