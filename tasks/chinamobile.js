@@ -49,6 +49,7 @@ function _去使用() {
 }
 
 module.exports = {
+    enable: true,
     appName: "中国移动",    // 任务名称
     priority: 2,             // 优先级
     fun: [去签到]

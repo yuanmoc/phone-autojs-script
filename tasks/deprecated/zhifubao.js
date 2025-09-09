@@ -111,6 +111,7 @@ function _复位到视频红包页面() {
 }
 
 module.exports = {
+    enable: false,
     appName: "支付宝",    // 任务名称
     priority: 2,             // 优先级
     fun: [

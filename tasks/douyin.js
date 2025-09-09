@@ -336,8 +336,12 @@ function _关闭弹窗() {
 }
 
 function _复位到赚钱页面() {
-    if (id('jzc').exists()) {
-        clickByText('jzc', {type: "id"})
+    if (id('qsb').exists()) {
+        id('qsb').click()
+        sleep(1000)
+    }
+    if (id('root_view').exists()) {
+        clickByText('root_view', {type: "id"})
         sleep(1000)
         let _签到提醒 = findTextByOCR("签到提醒")
         if (_签到提醒) {
@@ -361,6 +365,7 @@ function _复位到赚钱页面() {
 }
 
 module.exports = {
+    enable: true,
     appName: "抖音极速版",    // 任务名称
     priority: 2,             // 优先级
     fun: [

@@ -10,19 +10,32 @@ module.exports = {
         const dir = "tasks"
         const taskFiles = files.listDir(dir, function(name){
             return name.endsWith(".js") && files.isFile(files.join(dir, name));
-        });
+        }).concat(files.listDir(dir, function(name){
+            return files.isDir(files.join(dir, name));
+        }).map(subDir => {
+            const subDirPath = files.join(dir, subDir);
+            return files.listDir(subDirPath, function(name){
+                return name.endsWith(".js") && files.isFile(files.join(subDirPath, name));
+            }).map(file => subDir + "/" + file);
+        }).flat());
 
         tasks = taskFiles.map(fileName => {
             const taskId = fileName.replace(".js", "");
             try {
-                logger.log(`加载任务文件: tasks/${fileName}`);
                 const taskModule = require(`../tasks/${fileName}`);
+                logger.log(`加载任务文件: tasks/${fileName}`);
                 // 假设每个任务模块都导出了一个包含run方法的对象
-                return Object.assign({taskId: taskId}, taskModule);
+                const task = Object.assign({taskId: taskId}, taskModule);
+                // 只有当任务的 enable 属性为 true 时才加入到任务中
+                if (task.enable !== true) {
+                    logger.log(`任务 ${taskId} 未启用，跳过加载`);
+                    return null;
+                }
+                return task;
             } catch (e) {
                 logger.log(`加载任务 ${taskId} 失败: ${e.message}`);
             }
-        });
+        }).filter(task => task !== null); // 过滤掉未启用的任务
         logger.log("所有任务已注册");
     },
 

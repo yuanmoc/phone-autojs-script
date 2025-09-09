@@ -139,6 +139,7 @@ function _复位到金币页面() {
 
 
 module.exports = {
+    enable: false,
     appName: "拼多多",    // 任务名称
     priority: 2,             // 优先级
     fun: [

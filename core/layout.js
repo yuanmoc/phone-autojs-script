@@ -1,6 +1,7 @@
 "ui";
 // 加载配置和工具
 const taskManager = require("./taskManager.js");
+const { getConfig } = require("./config.js");
 // 注册所有任务
 taskManager.registerTasks();
 
@@ -27,7 +28,7 @@ ui.layout(
             </horizontal>
         <text/>
         <button id="run_selected_task" text="运行选定任务" layout_width="match_parent" layout_height="wrap_content" margin_top="16"/>
-        <button id="run_all_tasks" text="运行所有任务" layout_width="match_parent" layout_height="wrap_content" margin_top="8"/>
+        <button id="run_simple_tasks" text="运行简单任务" layout_width="match_parent" layout_height="wrap_content" margin_top="8"/>
         <button id="exit_app" text="退出" layout_width="match_parent" layout_height="wrap_content" margin_top="8"/>
     </vertical>
 );
@@ -127,12 +128,17 @@ ui.run_selected_task.click(function() {
     });
 });
 
+let simpleTasks = getConfig("simpleTasks")
+
 // 运行所有任务按钮点击事件
-ui.run_all_tasks.click(function() {
-    toast("开始运行所有任务");
+ui.run_simple_tasks.click(function() {
+    toast("开始运行简单任务");
     // 在子线程中运行所有任务，避免阻塞UI线程
     threads.start(function() {
-        taskManager.checkAndRunTasks();
+        for (let taskId in simpleTasks) {
+            // 为每个任务 ID 运行指定的方法
+            taskManager.runTask(taskId, simpleTasks[taskId]);
+        }
     });
 });
 
@@ -146,6 +152,9 @@ ui.exit_app.click(function() {
 if (!device.isScreenOn()) {
     // 屏幕是不亮屏，直接跑任务
     threads.start(function() {
-        taskManager.checkAndRunTasks();
+        for (let taskId in simpleTasks) {
+            // 为每个任务 ID 运行指定的方法
+            taskManager.runTask(taskId, simpleTasks[taskId]);
+        }
     });
 }

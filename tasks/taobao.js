@@ -104,6 +104,7 @@ function 复位到首页() {
 
 
 module.exports = {
+    enable: true,
     appName: "淘宝",    // 任务名称
     priority: 1,             // 优先级
     fun: [

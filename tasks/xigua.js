@@ -220,6 +220,7 @@ function _重置到首页() {
 
 
 module.exports = {
+    enable: true,
     appName: "西瓜视频",    // 任务名称
     priority: 2,             // 优先级
     fun: [

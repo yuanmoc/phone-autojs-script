@@ -168,6 +168,7 @@ function _复位去赚钱() {
 }
 
 module.exports = {
+    enable: true,
     appName: "快手极速版",    // 任务名称
     priority: 2,             // 优先级
     fun: [
